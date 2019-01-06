@@ -1,0 +1,292 @@
+<?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Design Quotes</title>
+
+    <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
+
+    <link rel='stylesheet' href='assets/css/bootstrap.min.css'>
+    <link rel='stylesheet' href='assets/css/font-awesome.min.css'>
+    <link rel="stylesheet" href="assets/css/jquery.minicolors.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+</head>
+<body ng-app="quoteApp">
+    <!-- <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+        ga('create', 'UA-98629499-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+    <script>
+      window.fbAsyncInit = function() {
+        FB.init({
+          appId      : '1762819797363648',
+          xfbml      : true,
+          version    : 'v2.9'
+        });
+        FB.AppEvents.logPageView();
+      };
+
+      (function(d, s, id){
+         var js, fjs = d.getElementsByTagName(s)[0];
+         if (d.getElementById(id)) {return;}
+         js = d.createElement(s); js.id = id;
+         js.src = "//connect.facebook.net/en_US/sdk.js";
+         fjs.parentNode.insertBefore(js, fjs);
+       }(document, 'script', 'facebook-jssdk'));
+    </script> -->
+<div ng-controller="EditorCtrl">
+    <nav class="navbar navbar-light bg-faded">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#"><span>Quotes Design</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav pull-right">
+                    <li><a ng-click="fabric.download('myCanvas')" class='btn-success'>Download</a></li>
+                    <!-- <li><a ng-click="uploadToServer()" class='btn-warning'>Share</a></li> -->
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class='row no-margin editor' on-size-changed="changeSize">
+        <div class="col-sm-4 sidebar">
+            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 bhoechie-tab-menu">
+              <div class="list-group">
+                <a class="list-group-item active text-center">
+                  <h4 class="fa fa-align-center"></h4><br/>Templates
+                </a>
+                <a class="list-group-item text-center">
+                  <h4 class="fa fa-font"></h4><br/>Font Style
+                </a>
+                <a class="list-group-item text-center">
+                  <h4 class="fa fa-picture-o"></h4><br/>Backgrounds
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-9 col-md-9 col-sm-9 col-xs-9 bhoechie-tab">
+                <div class="bhoechie-tab-content active">
+                   <div class="row background-color-list no-margin">
+                        <!-- <h4>Select A Template</h4> -->
+                        <div class="col-xs-2 background-color-list-box" ng-repeat="bt in backgroundTemplates">
+                            <span ng-click="applyTemplate($index)" ng-style="bt.pStyle"><i class="fa fa-align-center"></i></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bhoechie-tab-content">
+                   <div class="row font-family-list no-margin">
+                        <!-- <h4>Choose Font Style</h4> -->
+                        <div class="font-style" ng-repeat="font in FabricConstants.fonts">
+                            <span ng-class="{active: font.name.toLowerCase() == fabric.selectedObject.fontFamily}" ng-click='fabric.selectedObject.fontFamily = font.name' style='font-family: {{ font.name }};'>{{ font.name }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bhoechie-tab-content">
+                    <div class="row background-list">
+                        <!-- <h4>Choose Background Image</h4> -->
+                        <input type="file" id="trigger" onchange="angular.element(this).scope().uploadImage(this)" accept="image/*" ng-model ="uploadedImage">
+                        <!-- <<button type="button" class="btn btn-primary" onclick="uploadImage()">Upload Image</button> -->
+                        <div class="col-xs-4 bg-img-thumbnail" ng-repeat="bg in backgroundImages">
+                            <img ng-src="assets/images/thumbnail/{{bg.pUrl}}" ng-click="changeBackground(bg.url)"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- <div class='col-xs-3 sidebar'>
+            <div class="row background-color-list no-margin">
+                <h4>Choose A Background</h4>
+                <div class="col-xs-2 background-color-list-box" ng-repeat="bt in backgroundTemplates" on-finish-render="test()">
+                    <span ng-click="applyTemplate($index)" ng-style="bt.pStyle"><i class="fa fa-align-center"></i></span>
+                </div>
+                <div id="template-overlay" ng-style="templateOverlay">
+                    <div class="template-loader"></div>
+                </div>
+            </div>
+            <hr>
+            <div class="row background-list">
+                <div class="col-xs-4 bg-img-thumbnail" ng-repeat="bg in backgroundImages">
+                    <img ng-src="assets/images/thumbnail/{{bg.pUrl}}" ng-click="changeBackground(bg.url)"/>
+                </div>
+                <div id="background-overlay" ng-style="templateOverlay">
+                    <div class="background-loader"></div>
+                </div>
+            </div>
+        </div> -->
+        <div class='col-xs-8 design-area'>
+            <div class="row buttons-bar">
+                <div class="btn-group inline pull-left" id="texteditor">
+                    <!-- <div class='btn-group border-right'>
+                        <a class="btn dropdown-toggle font-family-btn toolbar-margin" data-toggle="dropdown">
+                            <span class='object-font-family-preview' style='font-family: "{{ fabric.selectedObject.fontFamily }}";' ng-bind="fabric.selectedObject.fontFamily">
+                            </span>
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li ng-repeat='font in FabricConstants.fonts' ng-click='fabric.selectedObject.fontFamily = font.name' style='font-family: {{ font.name }};'>
+                                <a>{{ font.name }}</a>
+                            </li>
+                        </ul>
+                    </div> -->
+                    <div class="btn-group border-right" ng-if='fabric.selectedObject'>
+                        <a class="btn dropdown-toggle font-size-btn toolbar-margin" data-toggle="dropdown">
+                            <span class='object-font-size-preview' ng-bind="fabric.selectedObject.fontSize">
+                            </span>
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li ng-repeat='font in FabricConstants.fontSizes' ng-click='fabric.selectedObject.fontSize = font.size'>
+                                <a>{{ font.size }}</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class='btn-group' ng-if='fabric.selectedObject'>
+                        <input data-toggle="tooltip" title="Choose Color" minicolors="customSettings" id="color-input" class="form-control" type="text" ng-model="fabric.selectedObject.fill">
+                    </div>
+                    <div class='btn-group toolbar-margin border-left border-right' ng-if='fabric.selectedObject'>
+                        <button data-toggle="tooltip" title="Bold" ng-class="{ active: fabric.isBold() }" ng-click="fabric.toggleBold()" class='btn btn-small tootbar-btn'><i class='fa fa-bold'></i></button>
+                        <button data-toggle="tooltip" title="Italic" ng-class="{ active: fabric.isItalic() }" ng-click="fabric.toggleItalic()" class='btn btn-small tootbar-btn'><i class='fa fa-italic'></i></button>
+                        <button data-toggle="tooltip" title="Underline" ng-class="{ active: fabric.isUnderline() }" ng-click="fabric.toggleUnderline()" class='btn btn-small tootbar-btn'><i class='fa fa-underline'></i></button>
+                        <!-- <button data-toggle="tooltip" title="Strike Through" ng-class="{ active: fabric.isLinethrough() }" ng-click="fabric.toggleLinethrough()" class='btn btn-small tootbar-btn'><i class='fa fa-strikethrough'></i></button> -->
+                    </div>
+                    <div class="btn-group border-right" ng-if='fabric.selectedObject'>
+                        <a class="btn dropdown-toggle text-align-btn toolbar-margin" data-toggle="dropdown" title="Text Align: {{fabric.selectedObject.textAlign}}">
+                            <span class='object-font-size-preview'><i class="fa fa-align-{{fabric.selectedObject.textAlign}}"></i></span>
+                        </a>
+                        <ul class="dropdown-menu text-align-dropdown">
+                            <li><a data-toggle="tooltip" title="Text Align: Left" ng-click="fabric.selectedObject.textAlign = 'left'"><i class="fa fa-align-left"></i></a></li>
+                            <li><a data-toggle="tooltip" title="Text Align: Center" ng-click="fabric.selectedObject.textAlign = 'center'"><i class="fa fa-align-center"></i></a></li>
+                            <li><a data-toggle="tooltip" title="Text Align: Right" ng-click="fabric.selectedObject.textAlign = 'right'"><i class="fa fa-align-right"></i></a></li>
+                        </ul>
+                    </div>
+                    <div class="btn-group border-right" ng-if='fabric.selectedObject'>
+                        <a class="btn dropdown-toggle text-align-btn toolbar-margin" data-toggle="dropdown" title="Change Case">      Aa</a>
+                        <ul class="dropdown-menu text-case">
+                            <li><a data-toggle="tooltip" ng-click="fabric.toLowerCase()">lowercase</a></li>
+                            <li><a data-toggle="tooltip" ng-click="fabric.toUpperCase()">UPPERCASE</a></li>
+                            <li><a data-toggle="tooltip" ng-click="fabric.toCapitalize()">Capitalize Each Word</a></li>
+                            <li><a data-toggle="tooltip" ng-click="fabric.toToggleCase()">tOGGLE cASE</a></li>
+
+                        </ul>
+                    </div>
+                    <div class="btn-group border-right">
+                        <a class="btn dropdown-toggle text-align-btn toolbar-margin" data-toggle="dropdown" title="Border">Border</a>
+                        <div class="border-box dropdown-menu">
+                            <div class="isborder-checkbox">
+                                <label class="checkbox">is Border</label>
+                                <input type="checkbox" ng-model="border.isBorder" ng-change='toggleBorder()'/>
+                            </div>
+                            <div class="seperator"></div>
+                            <div class="border-widths">
+                                <h6 class="text-left">Border Width</h6>
+                                <ul>
+                                    <li ng-repeat="b in border.borderWidths">
+                                        <label>{{b.width}}</label>
+                                        <input type="radio" ng-model="$parent.border.width" value={{b.width}} ng-change='changeBorderWidth()'/>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <!-- <ul class="dropdown-menu">
+                            <li>
+                                <form>
+
+                                </form>
+                            </li>
+                        </ul> -->
+                    </div>
+                  <!--  <div class='btn-group'>
+                      <button data-toggle="tooltip" title="Text Align: Left" ng-class="{ active: fabric.selectedObject.textAlign == 'left' }" ng-click="fabric.selectedObject.textAlign = 'left'" class='btn btn-small tootbar-btn'><i class='fa fa-align-left'></i></button>
+                      <button data-toggle="tooltip" title="Text Align: Center" ng-class="{ active: fabric.selectedObject.textAlign == 'center' }" ng-click="fabric.selectedObject.textAlign = 'center'" class='btn btn-small tootbar-btn'><i class='fa fa-align-center'></i></button>
+                      <button data-toggle="tooltip" title="Text Align: Right" ng-class="{ active: fabric.selectedObject.textAlign == 'right' }" ng-click="fabric.selectedObject.textAlign = 'right'" class='btn btn-small tootbar-btn'><i class='fa fa-align-right'></i></button>
+                  </div> -->
+                </div>
+                <div class="pull-right" align="" id="imageeditor" ng-if='fabric.selectedObject'>
+                    <div class="btn-group border-left">
+                        <!-- <button data-toggle="tooltip" title="Flip" rel="tooltip" class='btn btn-small tootbar-btn' ng-class="{ active: fabric.getFlipX() }" ng-click="{ active: fabric.toggleFlipX() }"><i class='fa fa-exchange'></i></button>                        -->
+                        <button data-toggle="tooltip" title="Center Horizontally" ng-click='fabric.centerH()' class='btn btn-small tootbar-btn'><img rel="noshare" ng-src="assets/images/icons/1.png" width="16" height="16"/></button>
+                        <button data-toggle="tooltip" title="Center Vertically" ng-click='fabric.centerV()' class='btn btn-small tootbar-btn'><img rel="noshare" ng-src="assets/images/icons/2.png" width="16" height="16"/></button>
+                    </div>
+                </div>
+
+            </div>
+            <div class="row">
+                <div class="col-xs-8">
+                    <div class='image-builder' parent-click="fabric.deactivateAll()">
+                        <div class='fabric-container'>
+                            <canvas fabric='fabric'></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-3">
+                    <div class="row well preset-size">
+                        <h4>Preset Sizes</h4>
+                        <div data-toggle="tooltip" title="{{FabricConstants.presetSizes[1].width}} x {{FabricConstants.presetSizes[1].height}}" class="col-xs-2 pinterest-preset-size preset" ng-class="{active: currentPreset.name == 'Pinterest'}" ng-click="changePreset(1)">
+                            <i class="fa fa-pinterest"></i>
+                        </div>
+                        <div class="col-xs-6">
+                            <div data-toggle="tooltip" title="{{FabricConstants.presetSizes[2].width}} x {{FabricConstants.presetSizes[2].height}}" class="row facebook-preset-size preset" ng-class="{active: currentPreset.name == 'Facebook'}" ng-click="changePreset(2)">
+                                <i class="fa fa-facebook"></i>
+                            </div>
+                            <div data-toggle="tooltip" title="{{FabricConstants.presetSizes[3].width}} x {{FabricConstants.presetSizes[3].height}}" class="row twitter-preset-size preset" ng-class="{active: currentPreset.name == 'Twitter'}" ng-click="changePreset(3)">
+                                <i class="fa fa-twitter"></i>
+                            </div>
+                        </div>
+                        <div data-toggle="tooltip" title="{{FabricConstants.presetSizes[0].width}} x {{FabricConstants.presetSizes[0].height}}" class="col-xs-4 instagram-preset-size preset" ng-class="{active: currentPreset.name == 'Instagram'}" ng-click="changePreset(0)">
+                            <i class="fa fa-instagram"></i>
+                        </div>
+                    </div>
+                    <div class="row well preset-size">
+                        <div ng-click="uploadToServer()" id="shareBtn" class="btn btn-success clearfix">Share To Facebook</div>
+                    </div>
+                </div>
+            </div>
+            <div class="zoom-section">
+                <button ng-click="zoomIn()" class='btn'><i class='fa fa-plus'></i></button>
+                <p>{{fabric.canvasScale | percentageText}}</p>
+                <button ng-click="zoomOut()" class='btn'><i class='fa fa-minus'></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src='assets/libs/jquery.min.js'></script>
+<script src="assets/libs/jquery-ui.min.js"></script>
+<script src='assets/libs/bootstrap.min.js'></script>
+<!-- <script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js'></script> -->
+<!-- <script src='assets/libs/fabric05182015.js'></script> -->
+<script src="http://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.7.15/fabric.min.js"></script>
+<!-- <script src='assets/libs/fabric.min.js'></script> -->
+<script src='assets/libs/angular.min.js'></script>
+<script src='assets/libs/angular-cookies.min.js'></script>
+<script src="assets/libs/angular-animate.min.js"></script>
+<script src="assets/libs/ui-bootstrap-2.5.0.min.js"></script>
+<script src='assets/libs/angular-route.min.js'></script>
+<script src='assets/libs/fabricCanvas.js'></script>
+<script src='assets/libs/fabricDirective.js'></script>
+<script src='assets/libs/fabricDirtyStatus.js'></script>
+<script src='assets/libs/fabricUtilities.js'></script>
+<script src='assets/libs/fabricWindow.js'></script>
+<script src="assets/libs/jquery.minicolors.js"></script>
+<script src="assets/libs/angular-minicolors.js"></script>
+<script src="assets/libs/masonry.pkgd.min.js"></script>
+
+  <script src='assets/js/fabric.js'></script>
+  <script src='assets/js/fabricConstants.js'></script>
+<script src="assets/js/functions.js"></script>
+
+<script src="assets/js/angular/app.js"></script>
+<script src="assets/js/angular/controllers.js"></script>
+<script src="assets/js/angular/services.js"></script>
+<script src="assets/js/angular/directives.js"></script>
+</body>
+</html>
